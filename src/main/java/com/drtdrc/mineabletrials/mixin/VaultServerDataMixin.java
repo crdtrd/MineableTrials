@@ -1,5 +1,6 @@
 package com.drtdrc.mineabletrials.mixin;
 
+import com.drtdrc.mineabletrials.MineableTrials;
 import com.drtdrc.mineabletrials.duck.VaultServerDataAccess;
 import net.minecraft.block.vault.VaultServerData;
 import net.minecraft.entity.player.PlayerEntity;
@@ -17,8 +18,8 @@ import java.util.UUID;
 @Mixin(VaultServerData.class)
 public abstract class VaultServerDataMixin implements VaultServerDataAccess {
 
-    @Unique private static final int ONE_HOUR_TICKS = 20 * 60 * 60;
-    @Unique private int globalCooldownTicks = 0;
+    @Unique private static final int ONE_HOUR_TICKS = 200;//20 * 60 * 60;
+    @Unique private int globalCooldownTicks = 300;
     @Unique private final Map<UUID, Integer> playerCooldownTicks = new HashMap<>();
 
     @Shadow @Final private Set<UUID> rewardedPlayers;
@@ -31,20 +32,22 @@ public abstract class VaultServerDataMixin implements VaultServerDataAccess {
         // will remove player from rewardedPlayers when cooldown is done
     }
 
-    @Inject(method = "hasRewardedPlayer", at = @At(value = "HEAD"), cancellable = true)
+    @Inject(method = "hasRewardedPlayer", at = @At(value = "RETURN"), cancellable = true)
     void onHasRewardedPlayer(PlayerEntity player, CallbackInfoReturnable<Boolean> cir) {
         // adds condition for global placement cooldown
-        cir.setReturnValue(cir.getReturnValue() && globalCooldownTicks != 0);
+        cir.setReturnValue(cir.getReturnValue() && globalCooldownTicks > 0);
     }
 
 
     @Override
     public int mineableTrials$getPlayerCooldownTicks(PlayerEntity player) {
-        return playerCooldownTicks.get(player.getUuid());
+        return (player == null) ? 0 : playerCooldownTicks.getOrDefault(player.getUuid(), 0);
     }
     @Override
     public void mineableTrials$setPlayerCooldownTicks(PlayerEntity player, int ticks) {
         playerCooldownTicks.put(player.getUuid(), ticks);
+//        MineableTrials.LOG.info(player.toString());
+//        MineableTrials.LOG.info(String.valueOf(ticks));
     }
     @Override
     public int mineableTrials$getGlobalCooldownTicks() {
@@ -53,6 +56,7 @@ public abstract class VaultServerDataMixin implements VaultServerDataAccess {
     @Override
     public void mineableTrials$setGlobalCooldownTicks(int ticks) {
         globalCooldownTicks = ticks;
+        MineableTrials.LOG.info(String.valueOf(ticks));
     }
     @Override
     public void mineableTrials$removePlayerFromRewardedPlayers(PlayerEntity player) {

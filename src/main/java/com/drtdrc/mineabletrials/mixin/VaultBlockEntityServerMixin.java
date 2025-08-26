@@ -1,11 +1,14 @@
 package com.drtdrc.mineabletrials.mixin;
 
+import com.drtdrc.mineabletrials.MineableTrials;
 import com.drtdrc.mineabletrials.duck.VaultServerDataAccess;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.VaultBlockEntity;
 import net.minecraft.block.vault.VaultConfig;
 import net.minecraft.block.vault.VaultServerData;
 import net.minecraft.block.vault.VaultSharedData;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -42,5 +45,4 @@ public abstract class VaultBlockEntityServerMixin {
 
     }
 
-    //@Inject(method = "tryUnlock", at = @At())
 }

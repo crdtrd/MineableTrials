@@ -1,6 +1,5 @@
 package com.drtdrc.mineabletrials.logic;
 
-import com.drtdrc.mineabletrials.item.MTItems;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.block.Blocks;
 import net.minecraft.component.DataComponentTypes;
@@ -37,23 +36,26 @@ public final class HarvestHandler {
 
             // Decide *which* vanilla item to drop
             ItemStack drop;
-            if (isVault) {
-                boolean ominous = state.contains(Properties.OMINOUS)
-                        && state.get(Properties.OMINOUS);
-                if (ominous) {
-                    // Drop our ominous-vault item
-                    drop = new ItemStack(MTItems.OMINOUS_VAULT_ITEM);
-                } else {
-                    // Drop the normal vanilla vault item
-                    var item = block.asItem();
-                    if (item == Items.AIR) return true;
-                    drop = new ItemStack(item);
-                }
-            } else { // Trial Spawner
-                var item = block.asItem();
-                if (item == Items.AIR) return true;
-                drop = new ItemStack(item);
-            }
+//            if (isVault) {
+//                boolean ominous = state.contains(Properties.OMINOUS)
+//                        && state.get(Properties.OMINOUS);
+//                if (ominous) {
+//                    // Drop our ominous-vault item
+//                    drop = new ItemStack(MTItems.OMINOUS_VAULT_ITEM);
+//                } else {
+//                    // Drop the normal vanilla vault item
+//                    var item = block.asItem();
+//                    if (item == Items.AIR) return true;
+//                    drop = new ItemStack(item);
+//                }
+//            } else { // Trial Spawner
+//                var item = block.asItem();
+//                if (item == Items.AIR) return true;
+//                drop = new ItemStack(item);
+//            }
+            var item = block.asItem();
+            if (item == Items.AIR) return true;
+            drop = new ItemStack(item);
 
             // Break without drops and spawn our chosen vanilla/custom stack
             world.breakBlock(pos, false, player);
