@@ -4,6 +4,9 @@
   "package": "com.drtdrc.mineabletrials.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "VaultBlockEntityServerMixin",
+    "VaultBlockMixin",
+    "VaultServerDataMixin"
   ],
   "injectors": {
     "defaultRequire": 1
