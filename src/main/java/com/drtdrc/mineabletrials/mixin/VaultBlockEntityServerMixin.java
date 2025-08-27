@@ -1,14 +1,11 @@
 package com.drtdrc.mineabletrials.mixin;
 
-import com.drtdrc.mineabletrials.MineableTrials;
 import com.drtdrc.mineabletrials.duck.VaultServerDataAccess;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.VaultBlockEntity;
 import net.minecraft.block.vault.VaultConfig;
 import net.minecraft.block.vault.VaultServerData;
 import net.minecraft.block.vault.VaultSharedData;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -18,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
+
 
 @Mixin(VaultBlockEntity.Server.class)
 public abstract class VaultBlockEntityServerMixin {
@@ -29,19 +27,28 @@ public abstract class VaultBlockEntityServerMixin {
         int gcTicks = serverDataMixin.mineableTrials$getGlobalCooldownTicks();
         List<ServerPlayerEntity> players = world.getPlayers();
 
-        // check each players tick. If 0, remove from rewardedPlayers, else deduct a tick
-        players.forEach(p -> {
-            int pcTicks = serverDataMixin.mineableTrials$getPlayerCooldownTicks(p);
-            if ( pcTicks == 0) {
-                serverDataMixin.mineableTrials$removePlayerFromRewardedPlayers(p);
-            } else {
-                serverDataMixin.mineableTrials$setPlayerCooldownTicks(p, pcTicks - 1);
-            }
-        });
-
         if (gcTicks > 0) {
+            players.forEach(p -> {
+                serverData.markPlayerAsRewarded(p);
+                serverDataMixin.mineableTrials$setPlayerCooldownTicks(p, gcTicks);
+            });
             serverDataMixin.mineableTrials$setGlobalCooldownTicks(gcTicks - 1);
         }
+
+        if (gcTicks == 0) {
+            players.forEach(p -> {
+                int pcTicks = serverDataMixin.mineableTrials$getPlayerCooldownTicks(p);
+                if (pcTicks == 0) {
+                    serverDataMixin.mineableTrials$removePlayerFromRewardedPlayers(p);
+                }
+                if (pcTicks > 0) {
+                    serverDataMixin.mineableTrials$setPlayerCooldownTicks(p, pcTicks - 1);
+                }
+            });
+        }
+
+
+
 
     }
 

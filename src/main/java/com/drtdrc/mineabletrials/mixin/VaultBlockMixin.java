@@ -24,9 +24,5 @@ public abstract class VaultBlockMixin extends BlockWithEntity {
     @Shadow @Final public static EnumProperty<Direction> FACING;
     @Shadow @Final public static Property<VaultState> VAULT_STATE;
 
-// will need this for placing ominous vault later
-//    @Inject(method = "getPlacementState", at = @At("RETURN"), cancellable = true)
-//    void onGetPlacementState(ItemPlacementContext ctx, CallbackInfoReturnable<BlockState> cir) {
-//        cir.setReturnValue((BlockState) this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite()));
-//    }
+
 }
