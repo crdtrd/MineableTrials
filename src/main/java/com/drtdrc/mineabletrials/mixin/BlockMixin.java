@@ -7,13 +7,18 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.VaultBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.VaultBlockEntity;
+import net.minecraft.block.spawner.EntityDetector;
+import net.minecraft.block.vault.VaultConfig;
+import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.loot.LootTables;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -25,6 +30,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
+import java.util.Optional;
 
 @Mixin(Block.class)
 public class BlockMixin {
@@ -56,7 +62,11 @@ public class BlockMixin {
         if (!(entity instanceof PlayerEntity)) return;
         // Build a Vault block item named "Ominous Vault" and copy full BE data
         ItemStack newDrop = new ItemStack(state.getBlock().asItem());
+        // need to make not italic
         newDrop.set(DataComponentTypes.CUSTOM_NAME, Text.literal("Ominous Vault"));
+
+        vbe.setConfig(new VaultConfig(LootTables.TRIAL_CHAMBERS_REWARD_OMINOUS_CHEST, 4.0, 4.5, new ItemStack(Items.OMINOUS_TRIAL_KEY), Optional.empty(), EntityDetector.NON_SPECTATOR_PLAYERS, EntityDetector.Selector.IN_WORLD));
+        newDrop.set(DataComponentTypes.BLOCK_ENTITY_DATA, vbe.getComponents().get(DataComponentTypes.BLOCK_ENTITY_DATA));
         cir.setReturnValue(List.of(newDrop));
 
     }
