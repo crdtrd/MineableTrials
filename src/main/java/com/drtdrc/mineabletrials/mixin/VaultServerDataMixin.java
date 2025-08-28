@@ -1,7 +1,6 @@
 package com.drtdrc.mineabletrials.mixin;
 
-import com.drtdrc.mineabletrials.MineableTrials;
-import com.drtdrc.mineabletrials.duck.VaultServerDataAccess;
+import com.drtdrc.mineabletrials.duck.VaultServerDataAccessor;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
 import com.mojang.serialization.Dynamic;
@@ -16,22 +15,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.*;
 
 @Mixin(VaultServerData.class)
-public abstract class VaultServerDataMixin implements VaultServerDataAccess {
+public abstract class VaultServerDataMixin implements VaultServerDataAccessor {
 
-    @Unique private static final int COOLDOWN_TICKS = 1200; //20 * 60 * 60, 1 hour
+    @Unique private static final int COOLDOWN_TICKS = 1000; //20 * 60 * 60, 1 hour
     @Unique private int globalCooldownTicks = 0; // gets set to COOLDOWN_TICKS when placed by player
     @Unique private final Map<UUID, Integer> playerCooldownTicks = new HashMap<>();
 
     @Shadow @Final private Set<UUID> rewardedPlayers;
 
-    private static final String CODEC_GLOBAL = "global_cooldown";
-    private static final String CODEC_LIST = "player_cooldowns";
-    private static final String CODEC_PLAYER = "player";
-    private static final String CODEC_TICKS = "ticks";
+    @Unique private static final String CODEC_GLOBAL = "global_cooldown";
+    @Unique private static final String CODEC_LIST = "player_cooldowns";
+    @Unique private static final String CODEC_PLAYER = "player";
+    @Unique private static final String CODEC_TICKS = "ticks";
+
     @Shadow @Mutable static Codec<VaultServerData> codec;
 
+    @Shadow abstract boolean hasRewardedPlayer(PlayerEntity player);
+
     @Invoker("markDirty")
-    abstract void mt$markDirty();
+    abstract void mineableTrials$markDirty();
 
     @Inject(method = "<clinit>", at = @At("TAIL"))
     private static void augmentCodec(CallbackInfo ci) {
@@ -42,7 +44,7 @@ public abstract class VaultServerDataMixin implements VaultServerDataAccess {
                     public <T> DataResult<T> encode(VaultServerData input, DynamicOps<T> ops, T prefix) {
                         DataResult<T> encoded = base.encode(input, ops, prefix);
                         return encoded.flatMap(mapNode -> {
-                            VaultServerDataAccess serverDataMixin = (VaultServerDataAccess) (Object) input;
+                            VaultServerDataAccessor serverDataMixin = (VaultServerDataAccessor) (Object) input;
                             DataResult<T> withGlobal = ops.mergeToMap(mapNode, ops.createString(CODEC_GLOBAL), ops.createInt(serverDataMixin.mineableTrials$getGlobalCooldownTicks()));
                             return withGlobal.flatMap(current -> {
                                 List<T> listElems = new ArrayList<>();
@@ -80,7 +82,7 @@ public abstract class VaultServerDataMixin implements VaultServerDataAccess {
                                }
                                return el;
                            });
-                           VaultServerDataAccess serverDataMixin = (VaultServerDataAccess) (Object) data;
+                           VaultServerDataAccessor serverDataMixin = (VaultServerDataAccessor) (Object) data;
                            serverDataMixin.mineableTrials$setGlobalCooldownTicks(global);
                            serverDataMixin.mineableTrials$setCooldownMap(map);
 
@@ -90,6 +92,13 @@ public abstract class VaultServerDataMixin implements VaultServerDataAccess {
                     }
                 }
         );
+    }
+
+    @Inject(method = "copyFrom", at = @At(value = "TAIL"))
+    void onCopyFrom(VaultServerData data, CallbackInfo ci) {
+        var sourceData = (VaultServerDataAccessor) (Object) data;
+        mineableTrials$setGlobalCooldownTicks(sourceData.mineableTrials$getGlobalCooldownTicks());
+        mineableTrials$setCooldownMap(sourceData.mineableTrials$getCooldownMap());
     }
 
 
@@ -106,7 +115,7 @@ public abstract class VaultServerDataMixin implements VaultServerDataAccess {
     @Override
     public void mineableTrials$setPlayerCooldownTicks(PlayerEntity player, int ticks) {
         playerCooldownTicks.put(player.getUuid(), ticks);
-        mt$markDirty();
+        mineableTrials$markDirty();
     }
     @Override
     public int mineableTrials$getGlobalCooldownTicks() {
@@ -115,19 +124,31 @@ public abstract class VaultServerDataMixin implements VaultServerDataAccess {
     @Override
     public void mineableTrials$setGlobalCooldownTicks(int ticks) {
         globalCooldownTicks = ticks;
-        MineableTrials.LOG.info(String.valueOf(ticks));
-        mt$markDirty();
+        mineableTrials$markDirty();
     }
     @Override
     public void mineableTrials$removePlayerFromRewardedPlayers(PlayerEntity player) {
         rewardedPlayers.remove(player.getUuid());
-        mt$markDirty();
+        mineableTrials$markDirty();
     }
+
+    @Override
+    public void mineableTrials$removePlayerFromRewardedPlayers(UUID uuid) {
+        rewardedPlayers.remove(uuid);
+        mineableTrials$markDirty();
+    }
+
     @Override
     public void mineableTrials$addPlayerToRewardedPlayers(PlayerEntity player) {
         rewardedPlayers.add(player.getUuid());
-        mt$markDirty();
+        mineableTrials$markDirty();
     }
+
+    @Override
+    public boolean mineableTrials$HasRewardedPlayer(PlayerEntity player) {
+        return this.hasRewardedPlayer(player);
+    }
+
     @Override
     public Map<UUID, Integer> mineableTrials$getCooldownMap() {
         return playerCooldownTicks;
@@ -136,6 +157,10 @@ public abstract class VaultServerDataMixin implements VaultServerDataAccess {
     public void mineableTrials$setCooldownMap(Map<UUID, Integer> map) {
         playerCooldownTicks.clear();
         if (map != null) playerCooldownTicks.putAll(map);
-        mt$markDirty();
+        mineableTrials$markDirty();
+    }
+    @Override
+    public int mineableTrials$getCooldownTickConstant() {
+        return COOLDOWN_TICKS;
     }
 }
