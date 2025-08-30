@@ -17,7 +17,7 @@ import java.util.*;
 @Mixin(VaultServerData.class)
 public abstract class VaultServerDataMixin implements VaultServerDataAccessor {
 
-    @Unique private static final int COOLDOWN_TICKS = 200; //20 * 60 * 60, 1 hour
+    @Unique private static final int COOLDOWN_TICKS = 72000; //20 * 60 * 60, 1 hour
     @Unique private int globalCooldownTicks = 0; // gets set to COOLDOWN_TICKS when placed by player
     @Unique private final Map<UUID, Integer> playerCooldownTicks = new HashMap<>();
 

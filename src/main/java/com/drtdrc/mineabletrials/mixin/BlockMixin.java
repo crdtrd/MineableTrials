@@ -50,24 +50,24 @@ public class BlockMixin {
         }
     }
 
-    @Inject(
-            method = "getDroppedStacks(Lnet/minecraft/block/BlockState;Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/entity/BlockEntity;Lnet/minecraft/entity/Entity;Lnet/minecraft/item/ItemStack;)Ljava/util/List;",
-            at = @At(value = "HEAD"),
-            cancellable = true
-    )
-    private static void onGetDroppedStacks(BlockState state, ServerWorld world, BlockPos pos, @Nullable BlockEntity blockEntity, @Nullable Entity entity, ItemStack stack, CallbackInfoReturnable<List<ItemStack>> cir) {
-        MineableTrials.LOG.info("onGetDroppedStacks");
-        if (!(state.getBlock() instanceof VaultBlock)) return;
-        if (!(blockEntity instanceof VaultBlockEntity vbe)) return;
-        if (!(entity instanceof PlayerEntity)) return;
-        // Build a Vault block item named "Ominous Vault" and copy full BE data
-        ItemStack newDrop = new ItemStack(state.getBlock().asItem());
-        // need to make not italic
-        newDrop.set(DataComponentTypes.CUSTOM_NAME, Text.literal("Ominous Vault"));
-
-        vbe.setConfig(new VaultConfig(LootTables.TRIAL_CHAMBERS_REWARD_OMINOUS_CHEST, 4.0, 4.5, new ItemStack(Items.OMINOUS_TRIAL_KEY), Optional.empty(), EntityDetector.NON_SPECTATOR_PLAYERS, EntityDetector.Selector.IN_WORLD));
-        newDrop.set(DataComponentTypes.BLOCK_ENTITY_DATA, vbe.getComponents().get(DataComponentTypes.BLOCK_ENTITY_DATA));
-        cir.setReturnValue(List.of(newDrop));
-
-    }
+//    @Inject(
+//            method = "getDroppedStacks(Lnet/minecraft/block/BlockState;Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/entity/BlockEntity;Lnet/minecraft/entity/Entity;Lnet/minecraft/item/ItemStack;)Ljava/util/List;",
+//            at = @At(value = "HEAD"),
+//            cancellable = true
+//    )
+//    private static void onGetDroppedStacks(BlockState state, ServerWorld world, BlockPos pos, @Nullable BlockEntity blockEntity, @Nullable Entity entity, ItemStack stack, CallbackInfoReturnable<List<ItemStack>> cir) {
+//        MineableTrials.LOG.info("onGetDroppedStacks");
+//        if (!(state.getBlock() instanceof VaultBlock)) return;
+//        if (!(blockEntity instanceof VaultBlockEntity vbe)) return;
+//        if (!(entity instanceof PlayerEntity)) return;
+//        // Build a Vault block item named "Ominous Vault" and copy full BE data
+//        ItemStack newDrop = new ItemStack(state.getBlock().asItem());
+//        // need to make not italic
+//        newDrop.set(DataComponentTypes.CUSTOM_NAME, Text.literal("Ominous Vault"));
+//
+//        vbe.setConfig(new VaultConfig(LootTables.TRIAL_CHAMBERS_REWARD_OMINOUS_CHEST, 4.0, 4.5, new ItemStack(Items.OMINOUS_TRIAL_KEY), Optional.empty(), EntityDetector.NON_SPECTATOR_PLAYERS, EntityDetector.Selector.IN_WORLD));
+//        newDrop.set(DataComponentTypes.BLOCK_ENTITY_DATA, vbe.getComponents().get(DataComponentTypes.BLOCK_ENTITY_DATA));
+//        cir.setReturnValue(List.of(newDrop));
+//
+//    }
 }
