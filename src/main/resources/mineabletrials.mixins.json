@@ -6,6 +6,7 @@
   "mixins": [
     "BlockMixin",
     "BlocksMixin",
+    "TrialSpawnerStateMixin",
     "VaultBlockEntityServerMixin",
     "VaultServerDataMixin"
   ],
