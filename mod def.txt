@@ -1,0 +1,8 @@
+Mod name: MineableTrials
+Things:
+- make trial spawners and trial vaults harvestable with silk touch pickaxe, iron and higher ✅
+✅ make a separate block item for the ominous vault
+    ✅ drops normal vault item, with Ominous annotation, should be able to stack and be separate from normal vault.
+✅ vaults have a 1 hour cooldown per player instead of permanently locking them out.
+    ✅ reactivation after cooldown
+✅ vault 1 hour cooldown begins on block placement, to prevent vault spamming.

@@ -7,22 +7,14 @@
   "authors": [],
   "contact": {},
   "license": "All-Rights-Reserved",
-  "icon": "assets/mineabletrials/icon.png",
   "environment": "*",
   "entrypoints": {
-    "client": [
-      "com.drtdrc.mineabletrials.client.MineableTrialsClient"
-    ],
     "main": [
       "com.drtdrc.mineabletrials.MineableTrials"
     ]
   },
   "mixins": [
-    "mineabletrials.mixins.json",
-    {
-      "config": "mineabletrials.client.mixins.json",
-      "environment": "client"
-    }
+    "mineabletrials.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=${loader_version}",
