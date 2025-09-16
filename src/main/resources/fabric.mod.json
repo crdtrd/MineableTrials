@@ -3,10 +3,12 @@
   "id": "mineabletrials",
   "version": "${version}",
   "name": "MineableTrials",
-  "description": "",
-  "authors": [],
-  "contact": {},
-  "license": "All-Rights-Reserved",
+  "description": "Harvest trial spawners and vaults!",
+  "authors": ["crdtrd"],
+  "contact": {
+    "issues": "https://github.com/crdtrd/MineableTrials/issues"
+  },
+  "license": "MIT",
   "environment": "*",
   "entrypoints": {
     "main": [
